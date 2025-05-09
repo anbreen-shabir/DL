@@ -1,0 +1,74 @@
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
+
+# TensorFlow Operations
+# Adding two tensors
+A = tf.constant([1,2,3,4])
+B = tf.constant([5,6,7,8])
+C = tf.add(A, B)
+print("Addition of tensors:", C)
+
+# Matrix multiplication
+A1 = tf.constant([[1,2],[4,5]])
+A2 = tf.constant([[3,4],[7,8]])
+print("Matrix multiplication:", tf.matmul(A1, A2))
+
+# Sum of all elements
+print("Sum of tensor elements:", tf.reduce_sum(A1))
+
+# NumPy Operations
+# Array creation and multiplication
+array = np.ones([2,2])
+print("Array of ones:", array)
+ten = np.multiply(array, 10)
+print("Array multiplied by 10:", ten)
+
+# Vector-Vector Multiplication
+def vect_vect(x1, x2):
+    total = 0
+    for w, x in zip(x1, x2):
+        total += w * x
+    return total
+
+w = np.random.rand(2)
+x = np.ones_like(w)
+print("Dot product of vectors:", vect_vect(w, x))
+
+# Matrix-Vector Multiplication
+def m_v(wm, xv):
+    total = []
+    for wv in wm:
+        total.append(vect_vect(wv, xv))
+    return total
+
+w = np.random.rand(10, 10)
+x = np.ones(10)
+print("Matrix-Vector multiplication:", m_v(w, x))
+
+# Matrix-Matrix Multiplication
+def mat_mat(x1, x2):
+    total = []
+    for w, x in zip(x1, x2):
+        total.append(vect_vect(w, x))
+    return total
+
+w = np.random.rand(3, 3)
+x = np.ones([3, 3])
+print("Matrix-Matrix multiplication:", mat_mat(w, x))
+
+# Random Vector Operations
+xv = np.random.rand(10)
+print("Random vector:", xv)
+print("Type, dimensions, shape:", type(xv), xv.ndim, xv.shape)
+
+# Fixed Vector-Vector Function
+def v_v(wv, xv):
+    total = 0
+    for w, v in zip(wv, xv):
+        total += w * v
+    return total
+
+w = np.random.rand(10)
+x = np.ones_like(w)
+print("Fixed dot product of vectors:", v_v(w, x))
