@@ -1,0 +1,61 @@
+import numpy as np
+
+# Unit step activation function: returns 1 if input is positive or zero, otherwise 0
+def unit_step(yin):
+    if yin >= 0:
+        return 1
+    else:
+        return 0
+
+# Perceptron function: calculates the weighted sum and applies the unit step function
+def perceptron(x, w, b):
+    yin = np.dot(w, x) + b  # Weighted sum plus bias
+    y = unit_step(yin)       # Apply unit step activation
+    return y
+
+# AND Gate Perceptron
+def AND_percep(x):
+    w = np.array([1, 1])     # Weights for AND gate
+    b = -1.5                 # Bias for AND gate
+    return perceptron(x, w, b)
+
+# OR Gate Perceptron
+def OR_percep(x):
+    w = np.array([1, 1])     # Weights for OR gate
+    b = -0.5                 # Bias for OR gate
+    return perceptron(x, w, b)
+
+# NOT Gate Perceptron
+def NOT_percep(x):
+    w = np.array([-1])       # Weight for NOT gate
+    b = 0.5                  # Bias for NOT gate
+    return perceptron(x, w, b)
+
+# XOR Gate using AND, OR, NOT perceptrons
+def XOR_gate(x):
+    and_not_b = AND_percep([x[0], NOT_percep(x[1])])  # A AND (NOT B)
+    not_a_and_b = AND_percep([NOT_percep(x[0]), x[1]]) # (NOT A) AND B
+    return OR_percep([and_not_b, not_a_and_b])         # A XOR B = (A AND (NOT B)) OR ((NOT A) AND B)
+
+# Test cases for AND gate
+example1 = np.array([1, 1])
+example2 = np.array([1, 0])
+example3 = np.array([0, 1])
+example4 = np.array([0, 0])
+
+print("AND({}, {}) = {}".format(1, 1, AND_percep(example1)))
+print("AND({}, {}) = {}".format(1, 0, AND_percep(example2)))
+print("AND({}, {}) = {}".format(0, 1, AND_percep(example3)))
+print("AND({}, {}) = {}".format(0, 0, AND_percep(example4)))
+
+# Test cases for OR gate
+print("OR({}, {}) = {}".format(1, 1, OR_percep(example1)))
+print("OR({}, {}) = {}".format(1, 0, OR_percep(example2)))
+print("OR({}, {}) = {}".format(0, 1, OR_percep(example3)))
+print("OR({}, {}) = {}".format(0, 0, OR_percep(example4)))
+
+# Test cases for XOR gate
+print("XOR({}, {}) = {}".format(1, 1, XOR_gate(example1)))
+print("XOR({}, {}) = {}".format(1, 0, XOR_gate(example2)))
+print("XOR({}, {}) = {}".format(0, 1, XOR_gate(example3)))
+print("XOR({}, {}) = {}".format(0, 0, XOR_gate(example4)))
