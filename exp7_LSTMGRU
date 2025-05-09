@@ -1,0 +1,228 @@
+import tensorflow as tf
+from tensorflow.keras.datasets import imdb
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense
+
+# ========== STEP 1: Load the IMDB dataset ==========
+# Load only the top 10,000 most frequently occurring words
+vocab_size = 10000
+maxlen = 200  # Limit all reviews to 200 words for consistency
+
+(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=vocab_size)
+
+# ========== STEP 2: Setup word index and decoder function ==========
+
+# Get the mapping from words to integer indices
+word_index = imdb.get_word_index()
+
+# Reverse the word index to get integer to word mapping
+#The first few integers (0, 1, 2, and 3) are reserved for special tokens,
+#so the actual word indices are shifted by 3 to make room.
+#Adding Special Tokens:
+
+reverse_word_index = {value + 3: key for key, value in word_index.items()}
+reverse_word_index[0] = "<PAD>"     # Padding token
+reverse_word_index[1] = "<START>"   # Start-of-sequence token
+reverse_word_index[2] = "<UNK>"     # Unknown word token
+reverse_word_index[3] = "<UNUSED>"  # Unused token
+
+# Function to decode an integer-encoded review back into words
+def decode_review(encoded_review):
+    return ' '.join([reverse_word_index.get(i, '?') for i in encoded_review])
+
+# Show an example review
+sample_index = 0
+encoded_sample = x_train[sample_index]
+decoded_sample = decode_review(encoded_sample)
+
+# Print encoded and decoded versions
+print(" Encoded Review:")
+print(encoded_sample)
+print("\n Decoded Review:")
+print(decoded_sample)
+print("\n Sentiment:", "Positive" if y_train[sample_index] == 1 else "Negative")
+
+# ========== STEP 3: Preprocess the data ==========
+# Pad the sequences to ensure uniform input length (200 words)
+x_train = pad_sequences(x_train, maxlen=maxlen, padding='post')
+x_test = pad_sequences(x_test, maxlen=maxlen, padding='post')
+
+# ========== STEP 4: Build the LSTM-based model ==========
+model = Sequential([
+    # Embedding layer converts word indices into dense vectors
+    Embedding(input_dim=vocab_size, output_dim=64, input_length=maxlen),
+
+    # LSTM layer learns sequential dependencies
+    LSTM(100), #a Long Short-Term Memory (LSTM) layer with 64 units (a.k.a. neurons or memory cells).
+
+
+
+    # Output layer with sigmoid activation for binary classification
+    Dense(1, activation='sigmoid')
+])
+
+# ========== STEP 5: Compile the model ==========
+# Use binary crossentropy loss because this is a binary classification problem
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Print model summary
+#model.summary()
+
+# ========== STEP 6: Train the model ==========
+# Train for 3 epochs, use 20% of training data as validation set
+history = model.fit(x_train, y_train, epochs=3, batch_size=64, validation_split=0.2)
+
+import tensorflow as tf
+from tensorflow.keras.datasets import imdb
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense
+
+# ========== STEP 1: Load the IMDB dataset ==========
+# Load only the top 10,000 most frequently occurring words
+vocab_size = 10000
+maxlen = 200  # Limit all reviews to 200 words for consistency
+
+(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=vocab_size)
+
+# ========== STEP 2: Setup word index and decoder function ==========
+
+# Get the mapping from words to integer indices
+word_index = imdb.get_word_index()
+
+# Reverse the word index to get integer to word mapping
+#The first few integers (0, 1, 2, and 3) are reserved for special tokens,
+#so the actual word indices are shifted by 3 to make room.
+#Adding Special Tokens:
+
+reverse_word_index = {value + 3: key for key, value in word_index.items()}
+reverse_word_index[0] = "<PAD>"     # Padding token
+reverse_word_index[1] = "<START>"   # Start-of-sequence token
+reverse_word_index[2] = "<UNK>"     # Unknown word token
+reverse_word_index[3] = "<UNUSED>"  # Unused token
+
+# Function to decode an integer-encoded review back into words
+def decode_review(encoded_review):
+    return ' '.join([reverse_word_index.get(i, '?') for i in encoded_review])
+
+# Show an example review
+sample_index = 0
+encoded_sample = x_train[sample_index]
+decoded_sample = decode_review(encoded_sample)
+
+# Print encoded and decoded versions
+print(" Encoded Review:")
+print(encoded_sample)
+print("\n Decoded Review:")
+print(decoded_sample)
+print("\n Sentiment:", "Positive" if y_train[sample_index] == 1 else "Negative")
+
+# ========== STEP 3: Preprocess the data ==========
+# Pad the sequences to ensure uniform input length (200 words)
+x_train = pad_sequences(x_train, maxlen=maxlen, padding='post')
+x_test = pad_sequences(x_test, maxlen=maxlen, padding='post')
+
+# ========== STEP 4: Build the LSTM-based model ==========
+model = Sequential([
+    # Embedding layer converts word indices into dense vectors
+    Embedding(input_dim=vocab_size, output_dim=64, input_length=maxlen),
+
+    # LSTM layer learns sequential dependencies
+    LSTM(100), #a Long Short-Term Memory (LSTM) layer with 64 units (a.k.a. neurons or memory cells).
+
+
+
+    # Output layer with sigmoid activation for binary classification
+    Dense(1, activation='sigmoid')
+])
+
+# ========== STEP 5: Compile the model ==========
+# Use binary crossentropy loss because this is a binary classification problem
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Print model summary
+#model.summary()
+
+# ========== STEP 6: Train the model ==========
+# Train for 3 epochs, use 20% of training data as validation set
+history = model.fit(x_train, y_train, epochs=3, batch_size=64, validation_split=0.2)
+
+import tensorflow as tf
+from tensorflow.keras.datasets import imdb
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense
+
+# ========== STEP 1: Load the IMDB dataset ==========
+# Load only the top 10,000 most frequently occurring words
+vocab_size = 10000
+maxlen = 200  # Limit all reviews to 200 words for consistency
+
+(x_train, y_train), (x_test, y_test) = imdb.load_data(num_words=vocab_size)
+
+# ========== STEP 2: Setup word index and decoder function ==========
+
+# Get the mapping from words to integer indices
+word_index = imdb.get_word_index()
+
+# Reverse the word index to get integer to word mapping
+#The first few integers (0, 1, 2, and 3) are reserved for special tokens,
+#so the actual word indices are shifted by 3 to make room.
+#Adding Special Tokens:
+
+reverse_word_index = {value + 3: key for key, value in word_index.items()}
+reverse_word_index[0] = "<PAD>"     # Padding token
+reverse_word_index[1] = "<START>"   # Start-of-sequence token
+reverse_word_index[2] = "<UNK>"     # Unknown word token
+reverse_word_index[3] = "<UNUSED>"  # Unused token
+
+# Function to decode an integer-encoded review back into words
+def decode_review(encoded_review):
+    return ' '.join([reverse_word_index.get(i, '?') for i in encoded_review])
+
+# Show an example review
+sample_index = 0
+encoded_sample = x_train[sample_index]
+decoded_sample = decode_review(encoded_sample)
+
+# Print encoded and decoded versions
+print(" Encoded Review:")
+print(encoded_sample)
+print("\n Decoded Review:")
+print(decoded_sample)
+print("\n Sentiment:", "Positive" if y_train[sample_index] == 1 else "Negative")
+
+# ========== STEP 3: Preprocess the data ==========
+# Pad the sequences to ensure uniform input length (200 words)
+x_train = pad_sequences(x_train, maxlen=maxlen, padding='post')
+x_test = pad_sequences(x_test, maxlen=maxlen, padding='post')
+
+# ========== STEP 4: Build the LSTM-based model ==========
+model = Sequential([
+    # Embedding layer converts word indices into dense vectors
+    Embedding(input_dim=vocab_size, output_dim=64, input_length=maxlen),
+
+    # LSTM layer learns sequential dependencies
+    LSTM(100), #a Long Short-Term Memory (LSTM) layer with 64 units (a.k.a. neurons or memory cells).
+
+
+
+    # Output layer with sigmoid activation for binary classification
+    Dense(1, activation='sigmoid')
+])
+
+# ========== STEP 5: Compile the model ==========
+# Use binary crossentropy loss because this is a binary classification problem
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Print model summary
+#model.summary()
+
+# ========== STEP 6: Train the model ==========
+# Train for 3 epochs, use 20% of training data as validation set
+history = model.fit(x_train, y_train, epochs=3, batch_size=64, validation_split=0.2)
+
+# ========== STEP 7: Evaluate the model ==========
+loss, accuracy = model.evaluate(x_test, y_test)
+print("\n Test Accuracy:", accuracy)
