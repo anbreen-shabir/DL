@@ -1,0 +1,116 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Input, SimpleRNN, Dense
+
+# ---------------------------------------------
+# Input sequence: shape (4,) -> reshape to (1, 4, 1)
+# 1 sample, 4 time steps, 1 feature per step
+# ---------------------------------------------
+x_seq = np.array([1, 2, 3, 4], dtype=np.float32)
+x_seq_reshaped = x_seq.reshape(1, 4, 1)
+
+# ---------------------------------------------
+# Manually defined RNN weights and biases
+# Wx: input-to-hidden weights (input_dim=1, hidden_units=2)
+# Wh: hidden-to-hidden weights (hidden_units=2 x 2)
+# bh: hidden biases (1D vector for each hidden unit)
+# Wy: hidden-to-output weights (hidden_units=2 to 1 output)
+# by: output bias
+# ---------------------------------------------
+Wx = np.array([[1.0, 0.5]])
+Wh = np.array([[0.1, 0.2],
+               [0.3, 0.4]])
+bh = np.array([0.1, -0.1])
+
+Wy = np.array([[0.7],
+               [-0.6]])
+by = np.array([0.05])
+
+# ---------------------------------------------
+#  Manual RNN forward pass implementation
+# Initial hidden state h is zero
+# Loop through each time step in x_seq
+# Compute:
+#   h_t = Wx * x_t + Wh * h_prev + bh
+#   y_t = Wy * h_t + by
+# Append each output to manual_outputs list
+# ---------------------------------------------
+h = np.array([0.0, 0.0])  # Initial hidden state
+manual_outputs = []
+
+for x_t in x_seq:
+    x_input = np.dot(x_t, Wx)           # Input transformation
+    h = x_input + np.dot(h, Wh) + bh    # Hidden state update
+    y = np.dot(h, Wy) + by              # Output computation
+    manual_outputs.append(y.item())     # Convert to scalar and store
+
+# ---------------------------------------------
+#  Define an equivalent RNN model in Keras
+# Input shape: 4 time steps, 1 feature
+# RNN layer with 2 units, linear activation, returns full sequence
+# Dense layer maps 2 hidden units to 1 output at each time step
+# ---------------------------------------------
+model = Sequential(name="manual_match_rnn")
+model.add(Input(shape=(4, 1)))  # Proper way to specify input
+model.add(SimpleRNN(2, return_sequences=True, activation='linear', use_bias=True, name="rnn_layer"))
+model.add(Dense(1, activation='linear', use_bias=True, name="dense_layer"))
+
+# ---------------------------------------------
+# Manually set the weights of RNN and Dense layers
+# These must match the same shapes used in manual computation
+# ---------------------------------------------
+rnn_layer = model.get_layer("rnn_layer")
+dense_layer = model.get_layer("dense_layer")
+
+rnn_layer.set_weights([Wx, Wh, bh])  # Set RNN weights
+dense_layer.set_weights([Wy, by])    # Set Dense layer weights
+
+# ---------------------------------------------
+#model to predict the output sequence
+
+x_seq_input=np.expand_dims(x_seq,axis=0)
+# predict
+keras_outputs = model.predict(x_seq_input)
+keras_outputs_flat = keras_outputs.flatten().tolist()
+print("keras_outputs:",keras_outputs_flat)
+
+
+
+
+# ---------------------------------------------
+# Use the model to make predictions on the same input
+# Output will be a sequence of shape (1, 4, 1)
+# We flatten to (4,) to match manual_outputs
+# ---------------------------------------------
+#model_outputs = model.predict((x_seq_reshaped, verbose==0)[0].flatten())
+
+model_outputs = model.predict(x_seq_reshaped[0])
+
+# ---------------------------------------------
+# Compare Manual vs Keras Model outputs
+# Print them side by side for each time step
+# ---------------------------------------------
+print(f"{'Time Step':^10} | {'Manual Output':^15} | {'Model Output':^15}")
+print("-" * 45)
+for t, (m, k) in enumerate(zip(manual_outputs, model_outputs), 1):
+    print(f"{t:^10} | {m:^15.4f} | {k:^15.4f}")
+
+# ---------------------------------------------
+# Plot outputs to visually compare them
+# Manual output: red dashed line with circles
+# Keras model output: blue solid line with crosses
+# ---------------------------------------------
+plt.figure(figsize=(8, 4))
+plt.plot(range(1, 5), manual_outputs, marker='o', label='Manual RNN', linestyle='--', color='red')
+plt.plot(range(1, 5), model_outputs, marker='x', label='Keras RNN', linestyle='-', color='blue')
+plt.title("RNN Outputs: Manual vs Keras")
+plt.xlabel("Time Step")
+plt.ylabel("Output Value")
+plt.legend()
+plt.grid(True)
+plt.xticks(range(1, 5))
+plt.tight_layout()
+plt.show()
+
