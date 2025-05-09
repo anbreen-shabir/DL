@@ -1,0 +1,57 @@
+from sklearn.model_selection import train_test_split
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Load the MNIST dataset
+(trainX_full, trainY_full), (testX_full, testY_full) = tf.keras.datasets.mnist.load_data()
+
+# Split the training data into train and validation sets
+trainX, testX, trainY, testY = train_test_split(trainX_full, trainY_full, test_size=0.30)
+
+# Display the first test image
+plt.imshow(testX[0])
+
+# One-hot encoding for labels
+trainY = tf.keras.utils.to_categorical(trainY, num_classes=10)
+testY = tf.keras.utils.to_categorical(testY, num_classes=10)
+
+# Check the first one-hot encoded label
+print(trainY[0])
+
+# Check the shape of the datasets
+print(trainX.shape)
+print(testX.shape)
+
+# Define the CNN model
+model = tf.keras.models.Sequential()
+
+# Add Conv2D and MaxPooling2D layers (Layer 1)
+model.add(Conv2D(64, kernel_size=3, padding="same", activation="relu", input_shape=(28, 28, 1)))
+model.add(MaxPool2D())
+
+# Add second Conv2D and MaxPooling2D layers (Layer 2)
+model.add(Conv2D(32, kernel_size=3, padding="same", activation="relu"))
+model.add(MaxPool2D())
+
+# Add third Conv2D and MaxPooling2D layers (Layer 3)
+model.add(Conv2D(16, kernel_size=3, padding="same", activation="relu"))
+model.add(MaxPool2D())
+
+# Flatten the output from the Conv2D layers
+model.add(Flatten())
+
+# Add a Dense output layer with 10 units (one for each digit 0-9)
+model.add(Dense(10, activation='softmax'))
+
+# Summarize the model architecture
+model.summary()
+
+# Compile the model
+model.compile(optimizer='sgd', loss='categorical_crossentropy', metrics=['accuracy'])
+
+# Train the model
+model.fit(trainX, trainY, epochs=3)
+
+# Predict the first 4 test samples
+model.predict(testX[:4])
